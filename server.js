@@ -1,3 +1,4 @@
+// Load environment variables
 require('dotenv').config();
 
 const express = require('express');
@@ -16,14 +17,12 @@ const config = {
 
 app.use(express.json());
 
-
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
-
 
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
@@ -32,7 +31,7 @@ app.use((req, res, next) => {
 
 /**
  * Fetch a random cat fact from the Cat Facts API
- * @returns {Promise<string>}
+ * @returns {Promise<string>} A random cat fact
  */
 async function fetchCatFact() {
   try {
@@ -51,7 +50,6 @@ async function fetchCatFact() {
   } catch (error) {
     console.error('Error fetching cat fact:', error.message);
     
-   
     if (error.code === 'ECONNABORTED') {
       throw new Error('Request to Cat Facts API timed out');
     } else if (error.response) {
@@ -65,14 +63,11 @@ async function fetchCatFact() {
 }
 
 
-app.get('/me', async (req, res) => {
+async function handleProfileRequest(req, res) {
   try {
-    
     const catFact = await fetchCatFact();
     
-    
     const timestamp = new Date().toISOString();
-    
     
     const response = {
       status: 'success',
@@ -88,10 +83,9 @@ app.get('/me', async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(response);
     
-    console.log(`✓ Successfully served /me endpoint with cat fact`);
+    console.log(`✓ Successfully served profile endpoint with cat fact`);
   } catch (error) {
-    console.error('Error in /me endpoint:', error.message);
-    
+    console.error('Error in profile endpoint:', error.message);
     
     res.setHeader('Content-Type', 'application/json');
     res.status(503).json({
@@ -101,7 +95,11 @@ app.get('/me', async (req, res) => {
       timestamp: new Date().toISOString()
     });
   }
-});
+}
+
+app.get('/', handleProfileRequest);
+
+app.get('/me', handleProfileRequest);
 
 app.get('/health', (req, res) => {
   res.status(200).json({
@@ -109,7 +107,6 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
-
 
 app.use((req, res) => {
   res.status(404).json({
@@ -119,7 +116,6 @@ app.use((req, res) => {
   });
 });
 
-
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
   res.status(500).json({
@@ -128,13 +124,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-
 app.listen(PORT, () => {
   console.log(`\n🚀 Server is running on port ${PORT}`);
-  console.log(`Profile endpoint: http://localhost:${PORT}/me`);
-  console.log(`Health check: http://localhost:${PORT}/health\n`);
+  console.log(`📍 Profile endpoint: http://localhost:${PORT}/me`);
+  console.log(`💚 Health check: http://localhost:${PORT}/health\n`);
 });
-
 
 process.on('SIGTERM', () => {
   console.log('SIGTERM signal received: closing HTTP server');
