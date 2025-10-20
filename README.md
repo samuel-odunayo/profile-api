@@ -34,8 +34,8 @@ Example Response:
 {
   "status": "success",
   "user": {
-    "email": "your.email@example.com",
-    "name": "Your Full Name",
+    "email": "Odunakomolede@gmail.com",
+    "name": "Odunayo Akomolede",
     "stack": "Node.js/Express"
   },
   "timestamp": "2025-10-17T14:23:45.678Z",
